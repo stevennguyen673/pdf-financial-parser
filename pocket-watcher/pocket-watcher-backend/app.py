@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 import os
 from werkzeug.utils import secure_filename
-from utils.parser import parse_pdf  
+from parser import parse_pdf  
 
 
 UPLOAD_FOLDER = 'uploads'
