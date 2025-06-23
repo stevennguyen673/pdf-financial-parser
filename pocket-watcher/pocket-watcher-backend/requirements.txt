@@ -2,3 +2,6 @@ flask
 flask-cors
 werkzeug
 matplotlib
+pdfplumber
+pytesseract
+Pillow
