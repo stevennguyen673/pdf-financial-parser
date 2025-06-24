@@ -83,10 +83,9 @@ def create_chart(financial_data):
         print("Chart saved successfully.")
 
         return {
-        "   chart_url": "/static/pie_chart.png"
+        "chart_url": "/static/pie_chart.png"
             }
 
     except Exception as e:
         print(f"Error:", e)
         raise
-    
