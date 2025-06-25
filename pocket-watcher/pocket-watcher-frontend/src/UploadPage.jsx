@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-
+import axios from 'axios';
+import LiquidGlass from 'liquid-glass-react';
 
 export default function UploadPage() {
-  const [chartUrl, setChartUrl] = useState(null);
+  const containerRef = useRef(null);
   const [file, setFile] = useState(null);
   const [uploadStatus, setUploadStatus] = useState('');
   const navigate = useNavigate();
@@ -17,7 +17,7 @@ export default function UploadPage() {
     }
   };
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+  const { getRootProps, getInputProps } = useDropzone({
     onDrop,
     accept: '.pdf,.csv,.xlsx,.json',
     maxFiles: 1,
@@ -25,130 +25,111 @@ export default function UploadPage() {
 
   const handleUpload = async () => {
     if (!file) {
-      setUploadStatus('Please select a file first.');
+      setUploadStatus('Please select a file.');
       return;
     }
+
     const formData = new FormData();
     formData.append('file', file);
-       try {
-    setUploadStatus('Uploading...');
-    const response = await axios.post(
-      'http://localhost:5000/upload', 
-      formData,
-      {
+
+    try {
+      setUploadStatus('Uploading...');
+      const res = await axios.post('http://localhost:5000/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
-      }
-    );
+      });
 
-    console.log('Response:', response.data);
-    setUploadStatus('Upload successful!');
-    setChartUrl(`http://localhost:5000${response.data.chart_url}`);
-    navigate('/results', {
-      state: {
-        chartUrl: `http://localhost:5000${response.data.chart_url}`,
-      },
-    });
-
-  } catch (error) {
-    console.error('Upload error:', error);
-    setUploadStatus('Upload failed. Please try again.');
-  }
-};
+      console.log('Response:', res.data);
+      setUploadStatus('Upload successful!');
+      navigate('/results', {
+        state: {
+          chartUrl: `http://localhost:5000${res.data.chart_url}`,
+        },
+      });
+    } catch (error) {
+      console.error('Upload error:', error);
+      setUploadStatus('Upload failed. Please try again.');
+    }
+  };
 
   return (
-    <div style={{ position: 'relative', width:'100vw', minHeight: '100vh', overflow: 'hidden' }}>
-      {/* Background Video */}
-      <video
-        autoPlay
-        loop
-        muted
-        playsInline
+    <div
+      ref={containerRef}
+      style={{
+        width: '100vw',
+        height: '100vh',
+        position: 'relative',
+        overflow: 'hidden',
+        backgroundImage: 'url("/background.jpg")',
+        backgroundSize: 'cover',
+        backgroundRepeat: 'no-repeat'
+      }}
+    >
+
+      {/* Glass */}
+      <LiquidGlass
+        mouseContainer={containerRef}
+        displacementScale={200}
+        blurAmount={0.3}
+        saturation={140}
+        elasticity={0.2}
+        aberrationIntensity={2}
+        cornerRadius={32}
+        glassSize = {{ width: 700, height: 150 }}
+        
         style={{
           position: 'absolute',
-          width:'100%',
-          height:'100%',
-          objectFit:'cover',
-          zIndex: -1,
-          top: 0,
-          left: 0,
+          top: '45%',
+          left: '50%',
+          textAlign: 'center',
+          color: 'white',
         }}
       >
-        <source src="/background.mp4" type="video/mp4" />
-        Your browser does not support the video tag.
-      </video>
-
-      {/* Glass card content */}
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '100vh',
-          padding: '1rem',
-        }}
-      >
+        <h2 style={{ marginBottom: '1rem', fontSize: '1.3rem' }}>
+          Transform Your Financial Snapshot
+        </h2>
         <div
+          {...getRootProps()}
           style={{
-            backdropFilter: 'blur(12px)',
-            backgroundColor: 'rgba(255, 255, 255, 0.1)',
-            border: '1px solid rgba(255, 255, 255, 0.3)',
-            borderRadius: '20px',
-            boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37)',
-            color: 'white',
-            maxWidth: '900px',
-            width: '100%',
-            padding: '40px',
-            textAlign: 'center',
+            border: '2px dashed white',
+            borderRadius: '16px',
+            padding: '10px',
+            cursor: 'pointer',
+            transition: 'border-color 0.2s ease',
           }}
         >
-          <h1 style={{fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif', fontSize: '2rem', fontWeight: 'bold', marginBottom: '1.5rem' }}>
-            Upload and Transform your Financial Life!
-          </h1>
-
-          <div
-            {...getRootProps()}
-            style={{
-              border: '2px dashed #222',
-              padding: '20px',
-              borderRadius: '12px',
-              backgroundColor: 'rgba(255, 255, 255, 0.5)',
-              color: 'rgb(2, 2, 2)',
-              marginBottom: '1rem',
-              cursor: 'pointer',
-            }}
-          >
-            <input {...getInputProps()} />
-            {file ? (
-              <p>Selected File: {file.name}</p>
-            ) : (
-              <p>Drag & drop a file here, or click to browse</p>
-            )}
-          </div>
-
-          <button
-            onClick={handleUpload}
-            style={{
-              padding: '10px 20px',
-              backgroundColor: 'white',
-              color: 'rgb(0, 0, 0)',
-              border: 'none',
-              borderRadius: '12px',
-              cursor: 'pointer',
-            }}
-          >
-            Upload
-          </button>
-
-          {chartUrl && (
-          <img
-            src={chartUrl}
-            alt="Expense Chart"
-            style={{ marginTop: '1rem', maxWidth: '100%', borderRadius: '12px' }}
-          />
-        )}
-
+          <input {...getInputProps()} />
+          <p>{file ? `Selected File: ${file.name}` : 'Drop a file or tap to select'}</p>
         </div>
-      </div>
+        <p style={{ marginTop: '1rem', fontSize: '0.9rem', color: '#ccc' }}>
+          {uploadStatus}
+        </p>
+      </LiquidGlass>
+
+      {/* Button */}
+      <LiquidGlass
+        mouseContainer={containerRef}
+        displacementScale={200}
+        blurAmount={0.10}
+        saturation={140}
+        elasticity={0.4}
+        aberrationIntensity={2}
+        cornerRadius={100}
+        padding="12px 32px"
+        onClick={handleUpload}
+        style={{
+          color: 'white',
+          textAlign: 'center',
+          position: 'absolute',
+          top: '75%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          cursor: 'pointer',
+          fontWeight: '600',
+          fontSize: '1rem',
+        }}
+      >
+        Continue
+      </LiquidGlass>
     </div>
   );
 }

@@ -1,15 +1,4 @@
-<<<<<<< HEAD
-Flask==2.3.3
-Flask-CORS==4.0.0
-matplotlib==3.7.2
-pdfminer.six==20221105
-Werkzeug==2.3.7
-=======
 flask
 flask-cors
 werkzeug
 matplotlib
-pdfplumber
-pytesseract
-Pillow
->>>>>>> 7fb0e0550ac1a229003ffbf84fb1ce335505850b

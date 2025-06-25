@@ -2,7 +2,8 @@ from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 import os
 from werkzeug.utils import secure_filename
-from parser import parse_pdf  
+from utils.parser import parse_pdf 
+from goals import generate_goal_chart 
 
 
 UPLOAD_FOLDER = 'uploads'
@@ -58,6 +59,37 @@ def upload_file():
 @app.route('/static/<path:filename>')
 def static_files(filename):
     return send_from_directory(app.static_folder, filename)
+
+@app.route('/generate_goal', methods=['POST'])
+def generate_goal():
+    data = request.json
+    income = float(data.get('income'))
+    goal = float(data.get('goal'))
+    total_spent = float(data.get('total_spending'))  #passing from front end.
+
+    result = generate_goal_chart(income, goal, total_spent)
+    return jsonify(result)
+
+@app.route('/process', methods=['POST'])
+def process_data():
+    
+
+    chart_urls = {
+        "pie": "/static/pie_chart.png",
+        "donut": "/static/donut_chart.png",
+        "bar": "/static/bar_chart.png",
+        "circle": "/static/circle.html",
+        "sankey": "/static/sankey.html"
+    }
+
+    return jsonify({
+        "success": True,
+        "chartUrls": chart_urls,
+        "totalSpending": total_spending,
+        "circle_data": circle_data,
+        "sankey_data": sankey_data,
+    })
+
 
 
 if __name__ == '__main__':

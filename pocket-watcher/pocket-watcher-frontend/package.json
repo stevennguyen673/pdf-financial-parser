@@ -11,6 +11,9 @@
   },
   "dependencies": {
     "axios": "^1.9.0",
+    "d3": "^7.9.0",
+    "d3-sankey": "^0.12.3",
+    "liquid-glass-react": "^1.1.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-dropzone": "^14.3.8",
