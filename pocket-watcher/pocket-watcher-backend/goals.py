@@ -1,17 +1,24 @@
-# goals.py
-
 import os
 import plotly.graph_objects as go
 
-# You can connect this value from parser.py
-# For now, we'll simulate it here
-total_spending: '752.3'
-def generate_goal_chart(income, savings_goal, total_spending):
-    savings = income - 752.3
-    progress = max(0, min(savings / savings_goal, 1))  
+def generate_goal_chart(income, savings_goal, total_spent=0):
+    """
+    Generates a savings goal gauge chart.
+    Args:
+        income (float): Total income.
+        savings_goal (float): Savings goal.
+        total_spent (float, optional): Total spending. Defaults to 0.
+    Returns:
+        dict: URLs and progress info for charts.
+    """
+    try:
+        savings = income - total_spent
+    except TypeError:
+        savings = income  # fallback if total_spent not provided
+
+    progress = max(0, min(savings / savings_goal, 1))
     percent = round(progress * 100, 1)
 
-    # Build the figure
     fig = go.Figure(go.Indicator(
         mode="gauge+number+delta",
         value=savings,
@@ -31,7 +38,6 @@ def generate_goal_chart(income, savings_goal, total_spending):
         title={'text': f"Progress to Saving Goal ({percent}%)"}
     ))
 
-    # Save to HTML
     static_dir = os.path.join(os.getcwd(), 'static')
     os.makedirs(static_dir, exist_ok=True)
     goal_path = os.path.join(static_dir, 'goal.html')
