@@ -62,10 +62,13 @@ def static_files(filename):
 
 @app.route('/generate_goal', methods=['POST'])
 def generate_goal():
-    data = request.json
-    income = float(data.get('income'))
-    goal = float(data.get('goal'))
-    total_spent = float(data.get('total_spending'))  #passing from front end.
+    data = request.json or {}
+    try:
+        income = float(data.get('income', 0))
+        goal = float(data.get('goal', 0))
+        total_spent = float(data.get('total_spending', 0))
+    except (TypeError, ValueError):
+        return jsonify({"error": "Invalid numeric input"}), 400
 
     result = generate_goal_chart(income, goal, total_spent)
     return jsonify(result)
